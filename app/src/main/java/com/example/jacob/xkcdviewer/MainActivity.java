@@ -1,6 +1,10 @@
 package com.example.jacob.xkcdviewer;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ClipData;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -9,6 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.GestureDetector;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,11 +39,11 @@ public class MainActivity extends AppCompatActivity
 {
 
     Document doc;
-    String comicElement, title, prevButtonLink, nextButtonLink;
+    String comicElement, title, altText;
     Elements images;
     ImageView comicImg;
     TextView titleTv;
-    Button nextBt, prevBt;
+    Button nextBt, prevBt, randBt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,11 +55,26 @@ public class MainActivity extends AppCompatActivity
         titleTv = (TextView) findViewById(R.id.comicTitleTV);
         nextBt = (Button) findViewById(R.id.nextBt);
         prevBt = (Button) findViewById(R.id.prevBt);
+        randBt = (Button) findViewById(R.id.randBt);
 
         GetPage getPage = new GetPage("http://www.xkcd.com");
 
         getPage.execute();
 
+        comicImg.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(true);
+                builder.setMessage(altText);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return false;
+            }
+        });
         prevBt.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -81,6 +104,16 @@ public class MainActivity extends AppCompatActivity
                 getPrevPage.execute();
             }
         });
+
+        randBt.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                GetPage getRandomPage = new GetPage("http://c.xkcd.com/random/comic");
+                getRandomPage.execute();
+            }
+        });
     }
 
     public class GetPage extends AsyncTask
@@ -108,6 +141,7 @@ public class MainActivity extends AppCompatActivity
 
                 //Get Comic Element
                 comicElement = images.get(1).absUrl("src");
+                altText = images.get(1).attr("title");
 
                 //Set proper density for imageView
                 options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
@@ -141,4 +175,5 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
     }
+
 }

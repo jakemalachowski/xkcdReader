@@ -3,4 +3,5 @@
     <string name="prevButton">Prev</string>
     <string name="nextButton">Next</string>
     <string name="comicContentDescription">xkcd Comic Image</string>
+    <string name="randomBt">Random</string>
 </resources>
