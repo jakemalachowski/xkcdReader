@@ -1,10 +1,6 @@
 package com.example.jacob.xkcdviewer;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ClipData;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -12,27 +8,16 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.GestureDetector;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
@@ -41,7 +26,7 @@ public class MainActivity extends AppCompatActivity
     Document doc;
     String comicElement, title, altText;
     Elements images;
-    ImageView comicImg;
+    TouchImageView comicImg;
     TextView titleTv;
     Button nextBt, prevBt, randBt;
 
@@ -51,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        comicImg = (ImageView) findViewById(R.id.comicImg);
+        comicImg = (TouchImageView) findViewById(R.id.comicImg);
         titleTv = (TextView) findViewById(R.id.comicTitleTV);
         nextBt = (Button) findViewById(R.id.nextBt);
         prevBt = (Button) findViewById(R.id.prevBt);
@@ -136,9 +121,6 @@ public class MainActivity extends AppCompatActivity
                 title = doc.getElementById("ctitle").text();
                 images = doc.getElementsByTag("img");
 
-
-                Log.d("Images", images.toString());
-
                 //Get Comic Element
                 comicElement = images.get(1).absUrl("src");
                 altText = images.get(1).attr("title");
@@ -160,6 +142,7 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Object o)
         {
             comicImg.setImageBitmap(comicBtmp);
+            comicImg.resetZoom();
             titleTv.setText(title);
         }
     }
