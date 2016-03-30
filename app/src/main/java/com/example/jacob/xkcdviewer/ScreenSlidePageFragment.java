@@ -6,11 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,7 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity
+/**
+ * Created by Jacob on 3/29/2016.
+ */
+public class ScreenSlidePageFragment extends Fragment
 {
 
     Document doc;
@@ -33,32 +39,23 @@ public class MainActivity extends AppCompatActivity
     Button nextBt, prevBt, randBt;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.screen_slide_page);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.screen_slide_page, container, false);
 
-        Intent i = new Intent(getApplicationContext(), ScreenSlidePagerActivity.class);
-        startActivity(i);
-        finish();
-
-/*        comicImg = (TouchImageView) findViewById(R.id.comicImg);
-        titleTv = (TextView) findViewById(R.id.comicTitleTV);
-        nextBt = (Button) findViewById(R.id.nextBt);
-        prevBt = (Button) findViewById(R.id.prevBt);
-        randBt = (Button) findViewById(R.id.randBt);
-        comicNumTv = (TextView) findViewById(R.id.comicNumTv);
-
-        GetPage getPage = new GetPage("http://www.xkcd.com");
-
-        getPage.execute();
+        comicImg = (TouchImageView) rootView.findViewById(R.id.comicImg);
+        titleTv = (TextView) rootView.findViewById(R.id.comicTitleTV);
+        nextBt = (Button) rootView.findViewById(R.id.nextBt);
+        prevBt = (Button) rootView.findViewById(R.id.prevBt);
+        randBt = (Button) rootView.findViewById(R.id.randBt);
+        comicNumTv = (TextView) rootView.findViewById(R.id.comicNumTv);
 
         comicImg.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
             public boolean onLongClick(View v)
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
                 builder.setCancelable(true);
                 builder.setMessage(altText);
                 AlertDialog dialog = builder.create();
@@ -106,7 +103,20 @@ public class MainActivity extends AppCompatActivity
                 getRandomPage.execute();
             }
         });
-        */
+
+        return rootView;
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        GetPage getPage = new GetPage("http://www.xkcd.com");
+
+        getPage.execute();
+
     }
 
     public class GetPage extends AsyncTask
