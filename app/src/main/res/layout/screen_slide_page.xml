@@ -43,24 +43,10 @@
         android:layout_gravity="center_horizontal"
         style="?android:attr/buttonBarStyle">
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/prevButton"
-            android:id="@+id/prevBt"
-            style="?android:attr/buttonBarButtonStyle"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/randomBt"
-            android:id="@+id/randBt"
-            style="?android:attr/buttonBarButtonStyle"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/nextButton"
-            android:id="@+id/nextBt"
-            style="?android:attr/buttonBarButtonStyle"/>
+            android:text="Shake the device for a random comic"/>
     </LinearLayout>
 
 </LinearLayout>
