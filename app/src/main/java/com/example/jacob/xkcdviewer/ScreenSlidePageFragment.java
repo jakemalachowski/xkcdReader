@@ -1,20 +1,15 @@
 package com.example.jacob.xkcdviewer;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -22,7 +17,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -30,13 +24,11 @@ import java.net.URL;
  */
 public class ScreenSlidePageFragment extends Fragment
 {
-
     Document doc;
-    String comicElement, title, altText, prevComicNum;
+    String comicElement, title, altText, prevComicNum, callingLink;
     Elements images;
     TouchImageView comicImg;
     TextView titleTv, comicNumTv;
-    Button nextBt, prevBt, randBt;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -45,9 +37,6 @@ public class ScreenSlidePageFragment extends Fragment
 
         comicImg = (TouchImageView) rootView.findViewById(R.id.comicImg);
         titleTv = (TextView) rootView.findViewById(R.id.comicTitleTV);
-        nextBt = (Button) rootView.findViewById(R.id.nextBt);
-        prevBt = (Button) rootView.findViewById(R.id.prevBt);
-        randBt = (Button) rootView.findViewById(R.id.randBt);
         comicNumTv = (TextView) rootView.findViewById(R.id.comicNumTv);
 
         comicImg.setOnLongClickListener(new View.OnLongClickListener()
@@ -64,59 +53,24 @@ public class ScreenSlidePageFragment extends Fragment
                 return false;
             }
         });
-        prevBt.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                //Get all link tags
-                Elements links = doc.getElementsByTag("a");
-                //Get the link to the previous comic
-                prevComicNum = links.get(11).attr("href");
-
-                GetPage getPrevPage = new GetPage("http://www.xkcd.com" + prevComicNum);
-                getPrevPage.execute();
-            }
-        });
-
-        nextBt.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                //Get all link tags
-                Elements links = doc.getElementsByTag("a");
-                //Get the link to the previous comic
-                String nextComicNum = links.get(13).attr("href");
-
-                GetPage getPrevPage = new GetPage("http://www.xkcd.com" + nextComicNum);
-                getPrevPage.execute();
-            }
-        });
-
-        randBt.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                GetPage getRandomPage = new GetPage("http://c.xkcd.com/random/comic");
-                getRandomPage.execute();
-            }
-        });
 
         return rootView;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        GetPage getPage = new GetPage("http://www.xkcd.com");
-
-        getPage.execute();
-
+        if(!callingLink.equals(""))
+        {
+            GetPage getPage = new GetPage(callingLink);
+            getPage.execute();
+        } else
+        {
+            GetPage getPage = new GetPage("http://www.xkcd.com");
+            getPage.execute();
+        }
     }
 
     public class GetPage extends AsyncTask
@@ -147,7 +101,7 @@ public class ScreenSlidePageFragment extends Fragment
                 //Get all link tags
                 Elements links = doc.getElementsByTag("a");
                 //Get the link to the previous comic
-                prevComicNum = links.get(11).attr("href");
+                prevComicNum = links.get(7).attr("href");
 
                 //Set proper density for imageView
                 options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
@@ -168,37 +122,9 @@ public class ScreenSlidePageFragment extends Fragment
             comicImg.setImageBitmap(comicBtmp);
             comicImg.resetZoom();
             titleTv.setText(title);
-            Log.d("Comic URL", prevComicNum);
-            String comicNumText = "xkcd: " + String.valueOf(getNumberFromUrl(prevComicNum, 0) + 1);
+            String comicNumText = "xkcd: " + String.valueOf(Utils.getNumberFromUrl(prevComicNum, 0) + 1);
             comicNumTv.setText(comicNumText);
         }
     }
 
-    //SOURCE: http://stackoverflow.com/questions/6407324/how-to-get-image-from-url-in-android
-    public static Drawable LoadImageFromWebOperations(String url) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-
-            return d;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private int getNumberFromUrl(String url, int defaultNumber) {
-        //Extracts the comic number from xkcd urls
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < url.length(); i++) {
-            char c = url.charAt(i);
-            if (c >= '0' && c <= '9') {
-                sb.append(c);
-            }
-        }
-        try {
-            return Integer.parseInt(sb.toString());
-        } catch (NumberFormatException e) {
-            return defaultNumber;
-        }
-    }
 }
