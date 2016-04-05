@@ -4,4 +4,5 @@
     <string name="nextButton">Next</string>
     <string name="comicContentDescription">xkcd Comic Image</string>
     <string name="randomBt">Random</string>
+    <string name="shakeTv">Shake the device for a random comic</string>
 </resources>
