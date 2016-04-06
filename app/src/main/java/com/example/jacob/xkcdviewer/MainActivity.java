@@ -6,14 +6,15 @@ import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -21,21 +22,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
 /**
  * Created by Jacob on 3/29/2016.
  * Fills the view of the View Pager and implements the adapter for the View Pager.
  */
-public class MainActivity extends FragmentActivity{
+public class MainActivity extends AppCompatActivity
+{
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private int newestComicNumber;
-
-    // The following are used for the shake detection
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private ShakeActivity mShakeDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,27 +50,32 @@ public class MainActivity extends FragmentActivity{
             e.printStackTrace();
         }
 
+
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+    }
 
-        // ShakeDetector initialization
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mShakeDetector = new ShakeActivity();
-/*        mShakeDetector.setOnShakeListener(new ShakeActivity.OnShakeListener() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
 
-            @Override
-            public void onShake(int count) {
-                ScreenSlidePageFragment getRandomPage = new ScreenSlidePageFragment();
-                getRandomPage.callingLink = "http://c.xkcd.com/random/comic";
-                getRandomPage.GetPage().execute();
-                mPager.setCurrentItem(mPagerAdapter);
-            }
-        });
-*/
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.random) {
+            Random random = new Random();
+            mPager.setCurrentItem(random.nextInt(newestComicNumber + 1));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter

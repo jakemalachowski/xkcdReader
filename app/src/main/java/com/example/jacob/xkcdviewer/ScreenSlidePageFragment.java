@@ -94,7 +94,6 @@ public class ScreenSlidePageFragment extends Fragment
 
                 //Get Comic Element
                 Element e = doc.getElementById("comic");
-                Log.d("doc", e.toString());
                 Elements es = e.select("img");
                 comicElement = es.get(0).absUrl("src");
                 altText = es.get(0).attr("title");
