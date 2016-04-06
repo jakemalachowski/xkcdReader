@@ -85,9 +85,7 @@ public class ScreenSlidePagerActivity extends FragmentActivity{
         @Override
         public Fragment getItem(int position)
         {
-            Log.d("newest", String.valueOf(newestComicNumber));
             ScreenSlidePageFragment screenSlidePageFragment = new ScreenSlidePageFragment();
-            Log.d("newestComicNumber", String.valueOf(newestComicNumber));
             screenSlidePageFragment.callingLink = "http://www.xkcd.com/" + String.valueOf(position);
             return screenSlidePageFragment;
         }
@@ -100,12 +98,12 @@ public class ScreenSlidePagerActivity extends FragmentActivity{
         }
     }
 
-    public class GetJSON extends AsyncTask
+    public class GetJSON extends AsyncTask <Void, Void, Void>
     {
         String json;
 
         @Override
-        protected Object doInBackground(Object[] params)
+        protected Void doInBackground(Void... params)
         {
             HttpURLConnection urlConnection = null;
             try
@@ -122,11 +120,12 @@ public class ScreenSlidePagerActivity extends FragmentActivity{
                 String line;
                 while((line = bf.readLine()) != null)
                 {
-                    sb.append(line + "\n");
+                    sb.append(line);
+                    sb.append("\n");
                 }
                 json = sb.toString();
 
-            } catch (IOException e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -140,8 +139,7 @@ public class ScreenSlidePagerActivity extends FragmentActivity{
                 JSONObject jsonObject = new JSONObject(json);
                 newestComicNumber = Integer.parseInt(jsonObject.getString("num"));
 
-                Log.d("newest in async", String.valueOf(newestComicNumber));
-            } catch (JSONException e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -150,7 +148,7 @@ public class ScreenSlidePagerActivity extends FragmentActivity{
         }
 
         @Override
-        protected void onPostExecute(Object o)
+        protected void onPostExecute(Void aVoid)
         {
             mPager.setCurrentItem(newestComicNumber);
         }

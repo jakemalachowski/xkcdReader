@@ -5,8 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +16,23 @@ import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
+import javax.xml.transform.Result;
 
 /**
  * Created by Jacob on 3/29/2016.
+ * Holds view of the main comic screen
  */
 public class ScreenSlidePageFragment extends Fragment
 {
     Document doc;
     String comicElement, title, altText, prevComicNum, callingLink;
-    Elements images;
     TouchImageView comicImg;
     TextView titleTv, comicNumTv;
 
@@ -44,12 +50,17 @@ public class ScreenSlidePageFragment extends Fragment
             @Override
             public boolean onLongClick(View v)
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setCancelable(true);
-                builder.setMessage(altText);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                    builder.setCancelable(true);
+                    builder.setMessage(altText);
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 return false;
             }
         });
@@ -62,18 +73,11 @@ public class ScreenSlidePageFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        if(!callingLink.equals(""))
-        {
-            GetPage getPage = new GetPage(callingLink);
-            getPage.execute();
-        } else
-        {
-            GetPage getPage = new GetPage("http://www.xkcd.com");
-            getPage.execute();
-        }
+        GetPage getPage = new GetPage(callingLink);
+        getPage.execute();
     }
 
-    public class GetPage extends AsyncTask
+    public class GetPage extends AsyncTask<Void, Void, Void>
     {
         String link;
         Bitmap comicBtmp;
@@ -84,24 +88,20 @@ public class ScreenSlidePageFragment extends Fragment
         }
 
         @Override
-        protected Object doInBackground(Object[] params)
+        protected Void doInBackground(Void... params)
         {
             BitmapFactory.Options options = new BitmapFactory.Options();
             try
             {
                 doc = Jsoup.connect(link).get();
                 title = doc.getElementById("ctitle").text();
-                images = doc.getElementsByTag("img");
 
                 //Get Comic Element
-                comicElement = images.get(1).absUrl("src");
-                altText = images.get(1).attr("title");
-
-                //Set the previous comic link so the number can be extracted later in order to set the current comic number
-                //Get all link tags
-                Elements links = doc.getElementsByTag("a");
-                //Get the link to the previous comic
-                prevComicNum = links.get(7).attr("href");
+                Element e = doc.getElementById("comic");
+                Log.d("doc", e.toString());
+                Elements es = e.select("img");
+                comicElement = es.get(0).absUrl("src");
+                altText = es.get(0).attr("title");
 
                 //Set proper density for imageView
                 options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
@@ -109,7 +109,8 @@ public class ScreenSlidePageFragment extends Fragment
                 //Download the image
                 URL url = new URL(comicElement);
                 comicBtmp = BitmapFactory.decodeStream(url.openConnection().getInputStream(), null, options);
-            } catch (IOException e)
+
+            }  catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -117,14 +118,15 @@ public class ScreenSlidePageFragment extends Fragment
         }
 
         @Override
-        protected void onPostExecute(Object o)
+        protected void onPostExecute(Void aVoid)
         {
             comicImg.setImageBitmap(comicBtmp);
             comicImg.resetZoom();
             titleTv.setText(title);
-            String comicNumText = "xkcd: " + String.valueOf(Utils.getNumberFromUrl(prevComicNum, 0) + 1);
+            String comicNumText = "xkcd: " + String.valueOf(Utils.getNumberFromUrl(callingLink, 0));
             comicNumTv.setText(comicNumText);
         }
+
     }
 
 }
