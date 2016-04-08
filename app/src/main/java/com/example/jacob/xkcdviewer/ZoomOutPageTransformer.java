@@ -5,6 +5,8 @@ import android.view.View;
 
 /**
  * Created by Jacob on 3/29/2016.
+ * Handles the transition of the ViewPager
+ * SOURCE: http://developer.android.com/training/animation/screen-slide.html
  */
 public class ZoomOutPageTransformer implements ViewPager.PageTransformer {
     private static final float MIN_SCALE = 0.85f;
