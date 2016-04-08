@@ -5,4 +5,5 @@
     <string name="comicContentDescription">xkcd Comic Image</string>
     <string name="randomBt">Random</string>
     <string name="shakeTv">Shake the device for a random comic</string>
+    <string name="footerTv">Swipe to the left for the previous comic. Long press for alt text</string>
 </resources>
